@@ -17,11 +17,15 @@ if ($argc < 3 || in_array($argv[0],['-h', '--help'])) {
 $command = $argv[1];
 
 try {
-    $rangeService = new \Service\RangeService(new PDO(DB_DSN, DB_USER, DB_PASS));
+    $pdo = new PDO(DB_DSN, DB_USER, DB_PASS);
+    $pdo->beginTransaction();
+
+    $rangeService = new \Service\RangeService($pdo);
+
 
     if ($command === 'create_range') {
         if ($argc < 3) {
-            throw new RuntimeException("create_range requires 2 arguments - min_value and max_value");
+            throw new \RuntimeException("create_range requires 2 arguments - min_value and max_value");
         }
         $min = (int)$argv[2];
         $max = (int)$argv[3];
@@ -37,11 +41,12 @@ try {
         $rangeId = (int) $argv[2];
         $number = (int) $argv[3];
 
-        $rangeService->release($number);
+        $rangeService->release($rangeId, $number);
         echo "Number $number successfully released";
     } else {
-        throw new Exception(HELP_MESSAGE);
+        throw new \Exception(HELP_MESSAGE);
     }
+    $pdo->commit();
 } catch (Exception $exception) {
     echo $exception->getMessage();
     die(1);
