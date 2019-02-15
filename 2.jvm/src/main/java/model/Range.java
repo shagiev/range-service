@@ -63,14 +63,14 @@ public class Range {
      *
      * @param number Number, that was allocated before.
      */
-    synchronized public void release(long number) {
+    synchronized public void release(long number) throws Exception {
         if (number < minValue || number > maxValue) {
-            throw new RuntimeException("Incorrect number " + number);
+            throw new Exception("Incorrect number " + number);
         }
         if ((number < minValue + free && !numbersByPosition.containsKey(number)) ||
             shuffledNumbers.contains(number)
         ) {
-            throw new RuntimeException("Cannot release free number");
+            throw new Exception("Cannot release free number");
         }
 
         // Because count from 0 for usage in map and set.
